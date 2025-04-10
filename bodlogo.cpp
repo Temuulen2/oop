@@ -1,91 +1,176 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
+#include <cmath>
+
 using namespace std;
 
+// Ерөнхий Shape класс
 class Shape {
 protected:
     string name;
-    static int objectCount;  // 1. Статик хувьсагч
-
+    static int objectCount; // Бүх объектын тоо
 public:
-    Shape(const string& n) : name(n) {
-        ++objectCount;
+    Shape(string n) : name(n) {
+        Shape::incrementCount(); // Объект үүсэхэд тоолж байна
     }
 
-    virtual ~Shape() {}
+    virtual double area() const = 0;
+    virtual double perimeter() const = 0;
 
-    static int getObjectCount() { return objectCount; }  // 2. Static функц
-    static void setObjectCount(int count) { objectCount = count; }
+    virtual void display() const {
+        cout << "Хэлбэр: " << this->name << endl;
+    }
 
-    virtual double getPerimeter() const = 0;  // 4. Жинхэнэ хийсвэр функц
-    virtual double getArea() const = 0;
+    virtual string getName() const {
+        return this->name;
+    }
 
-    void showInfo() const {
-        cout << "Name: " << this->name  // 3. this ашиглав
-             << ", Perimeter: " << this->getPerimeter()
-             << ", Area: " << this->getArea() << endl;
+    static void incrementCount() {
+        ++Shape::objectCount;
+    }
+
+    static int getObjectCount() {
+        return Shape::objectCount;
     }
 };
 
-int Shape::objectCount = 0;  // 1. Статик хувьсагчийн эхлэл утга
+// Статик хувьсагчийн анхны утга
+int Shape::objectCount = 0;
 
-class Rectangle : public Shape {
-    double width, height;
-
+// 2D Shape ангилал
+class Shape2D : public Shape {
 public:
-    Rectangle(double w, double h) : Shape("Rectangle"), width(w), height(h) {}
+    Shape2D(string n) : Shape(n) {}
 
-    double getPerimeter() const override {
-        return 2 * (this->width + this->height);  // 3. this ашиглав
-    }
-
-    double getArea() const override {
-        return this->width * this->height;  // 3. this ашиглав
-    }
+    virtual double area() const override = 0;
+    virtual double perimeter() const override = 0;
 };
 
-class Circle : public Shape {
+// Тойрог
+class Circle : public Shape2D {
+private:
+    double x, y;
     double radius;
-
 public:
-    Circle(double r) : Shape("Circle"), radius(r) {}
+    Circle(double cx, double cy, double r) : Shape2D("Тойрог"), x(cx), y(cy), radius(r) {}
 
-    double getPerimeter() const override {
-        return 2 * 3.14159 * this->radius;
+    double area() const override {
+        return M_PI * this->radius * this->radius;
     }
 
-    double getArea() const override {
-        return 3.14159 * this->radius * this->radius;
+    double perimeter() const override {
+        return 2 * M_PI * this->radius;
+    }
+
+    void display() const override {
+        cout << "Тойрог: Төв(" << this->x << ", " << this->y << "), Радиус: " << this->radius << endl;
+        cout << "Талбай: " << this->area() << ", Периметр: " << this->perimeter() << endl;
     }
 };
 
-// 5. Эрэмбэлэхэд ашиглах харьцуулалтын функцүүд
-bool compareByPerimeter(const Shape* a, const Shape* b) {
-    return a->getPerimeter() < b->getPerimeter();
+// Квадрат
+class Square : public Shape2D {
+private:
+    double x, y;
+    double side;
+    double x2, y2, x3, y3;
+public:
+    Square(double topLeftX, double topLeftY, double s) : Shape2D("Квадрат"), x(topLeftX), y(topLeftY), side(s) {
+        this->x2 = this->x + this->side;
+        this->y2 = this->y;
+        this->x3 = this->x;
+        this->y3 = this->y - this->side;
+    }
+
+    double area() const override {
+        return this->side * this->side;
+    }
+
+    double perimeter() const override {
+        return 4 * this->side;
+    }
+
+    void display() const override {
+        cout << "Квадрат: Зүүн Дээд Орой(" << this->x << ", " << this->y << "), Тал: " << this->side << endl;
+        cout << "Бусад оройнууд: (" << this->x2 << ", " << this->y2 << "), (" << this->x3 << ", " << this->y3 << ")" << endl;
+        cout << "Талбай: " << this->area() << ", Периметр: " << this->perimeter() << endl;
+    }
+};
+
+// Зөв гурвалжин
+class Triangle : public Shape2D {
+private:
+    double x, y;
+    double side;
+    double x2, y2, x3, y3;
+public:
+    Triangle(double topX, double topY, double s) : Shape2D("Зөв Гурвалжин"), x(topX), y(topY), side(s) {
+        this->x2 = this->x - this->side / 2;
+        this->y2 = this->y - (sqrt(3) / 2) * this->side;
+        this->x3 = this->x + this->side / 2;
+        this->y3 = this->y - (sqrt(3) / 2) * this->side;
+    }
+
+    double area() const override {
+        return (sqrt(3) / 4) * this->side * this->side;
+    }
+
+    double perimeter() const override {
+        return 3 * this->side;
+    }
+
+    void display() const override {
+        cout << "Зөв Гурвалжин: Дээд Орой(" << this->x << ", " << this->y << "), Тал: " << this->side << endl;
+        cout << "Бусад оройнууд: (" << this->x2 << ", " << this->y2 << "), (" << this->x3 << ", " << this->y3 << ")" << endl;
+        cout << "Талбай: " << this->area() << ", Периметр: " << this->perimeter() << endl;
+    }
+};
+
+// Эрэмбэлэх функц: талбай болон периметрээр
+void sortShapes(Shape* shapes[], int size) {
+    for (int i = 0; i < size - 1; ++i) {
+        for (int j = 0; j < size - i - 1; ++j) {
+            double area1 = shapes[j]->area();
+            double area2 = shapes[j + 1]->area();
+
+            if (area1 > area2 || (area1 == area2 && shapes[j]->perimeter() > shapes[j + 1]->perimeter())) {
+                Shape* temp = shapes[j];
+                shapes[j] = shapes[j + 1];
+                shapes[j + 1] = temp;
+            }
+        }
+    }
 }
 
-bool compareByArea(const Shape* a, const Shape* b) {
-    return a->getArea() < b->getArea();
-}
-
+// Гол програм
 int main() {
-    vector<Shape*> shapes;
-    shapes.push_back(new Rectangle(4, 6));
-    shapes.push_back(new Circle(3));
-    shapes.push_back(new Rectangle(2, 5));
-    shapes.push_back(new Circle(5));
+    Shape* shapes[3];
+    double cx, cy, radius, sx, sy, side, tx, ty, tside;
 
-    cout << "Total shapes: " << Shape::getObjectCount() << endl << endl;
+    cout << "Тойргийн төвийн координат (x, y) болон радиусыг оруулна уу: ";
+    cin >> cx >> cy >> radius;
+    shapes[0] = new Circle(cx, cy, radius);
 
-    cout << "Sorted by perimeter:" << endl;
-    sort(shapes.begin(), shapes.end(), compareByPerimeter);
-    for (auto s : shapes) s->showInfo();
+    cout << "Квадратын зүүн дээд оройн координат (x, y) болон талын уртыг оруулна уу: ";
+    cin >> sx >> sy >> side;
+    shapes[1] = new Square(sx, sy, side);
 
-    cout << "\nSorted by area:" << endl;
-    sort(shapes.begin(), shapes.end(), compareByArea);
-    for (auto s : shapes) s->showInfo();
+    cout << "Зөв гурвалжны дээд оройн координат (x, y) болон талын уртыг оруулна уу: ";
+    cin >> tx >> ty >> tside;
+    shapes[2] = new Triangle(tx, ty, tside);
 
-    for (auto s : shapes) delete s;
+    sortShapes(shapes, 3);
+
+    cout << "\nТалбай болон периметрээр эрэмбэлсэн хэлбэрүүд:\n";
+    for (int i = 0; i < 3; ++i) {
+        shapes[i]->display();
+        cout << "----------------------" << endl;
+    }
+
+    cout << "Нийт хэлбэрүүдийн тоо: " << Shape::getObjectCount() << endl;
+
+    for (int i = 0; i < 3; ++i) {
+        delete shapes[i];
+    }
+
     return 0;
 }
