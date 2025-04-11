@@ -7,8 +7,13 @@ using namespace std;
 class Shape {
 protected:
     string name;
+     static int objectCount; // Бүх объектын тоо
+
 public:
-    Shape(string n) : name(n) {}  // Нэр оноох байгуулагч
+    Shape(string n) : name(n) {
+        Shape::incrementCount(); // Объект үүсэхэд тоолж байна
+    }
+
 
     virtual double area() = 0;    // Цэвэр виртуал функц (талбай)
     virtual double perimeter() = 0; // Цэвэр виртуал функц (периметр)
@@ -20,7 +25,19 @@ public:
     virtual string getName() const {
         return name;
     }
+     static void incrementCount() {
+        ++Shape::objectCount;
+    }
+
+     static int getObjectCount() {
+        return Shape::objectCount;
+    }
+
 };
+// Статик хувьсагчийн анхны утга
+int Shape::objectCount = 0;
+
+
 
 // 2DShape (хоёр хэмжээст хэлбэрүүдийн нийтлэг ангилал)
 class Shape2D : public Shape {
