@@ -3,67 +3,67 @@
 
 using namespace std;
 
-// Ерөнхий Shape класс (Нийтлэг шинж чанарууд)
+// Ерөнхий Shape класс
 class Shape {
 protected:
     string name;
-     static int objectCount; // Бүх объектын тоо
-
+    static int objectCount; // Бүх объектын тоо
 public:
     Shape(string n) : name(n) {
         Shape::incrementCount(); // Объект үүсэхэд тоолж байна
     }
 
+    virtual double area() const = 0;
+    virtual double perimeter() const = 0;
 
-    virtual double area() = 0;    // Цэвэр виртуал функц (талбай)
-    virtual double perimeter() = 0; // Цэвэр виртуал функц (периметр)
-
-    virtual void display() {
-        cout << "Хэлбэр: " << name << endl;
+    virtual void display() const {
+        cout << ":" << this->name << endl;
     }
 
     virtual string getName() const {
-        return name;
+        return this->name;
     }
-     static void incrementCount() {
+
+    static void incrementCount() {
         ++Shape::objectCount;
     }
 
-     static int getObjectCount() {
+    static int getObjectCount() {
         return Shape::objectCount;
     }
-
 };
+
 // Статик хувьсагчийн анхны утга
 int Shape::objectCount = 0;
 
-
-
-// 2DShape (хоёр хэмжээст хэлбэрүүдийн нийтлэг ангилал)
+// 2D Shape ангилал
 class Shape2D : public Shape {
 public:
-    Shape2D(string n) : Shape(n) {}  // Эцэг классын байгуулагчийг дуудаж байна
+    Shape2D(string n) : Shape(n) {}
+
+    virtual double area() const override = 0;
+    virtual double perimeter() const override = 0;
 };
 
-// Тойргийн класс
+// Тойрог
 class Circle : public Shape2D {
 private:
-    double x, y; // Тойргийн төвийн координат
-    double radius; // Радиус
+    double x, y;
+    double radius;
 public:
     Circle(double cx, double cy, double r) : Shape2D("Тойрог"), x(cx), y(cy), radius(r) {}
 
-    double area() override {
-        return M_PI * radius * radius; // Тойргийн талбай
+    double area() const override {
+        return M_PI * this->radius * this->radius;
     }
 
-    double perimeter() override {
-        return 2 * M_PI * radius; // Тойргийн периметр
+    double perimeter() const override {
+        return 2 * M_PI * this->radius;
     }
 
-    void display() override {
-        cout << "Тойрог: Төв(" << x << ", " << y << "), Радиус: " << radius << endl;
-        cout << "Талбай: " << area() << ", Периметр: " << perimeter() << endl;
+    void display() const override {
+        cout << "Тойрог: Төв(" << this->x << ", " << this->y << "), Радиус: " << this->radius << endl;
+        cout << "Талбай: " << this->area() << ", Периметр: " << this->perimeter() << endl;
     }
 };
 
