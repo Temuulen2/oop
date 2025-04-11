@@ -69,112 +69,108 @@ public:
 
 // Квадратын класс
 class Square : public Shape2D {
-private:
-    double x, y;  // Зүүн дээд орой
-    double side;  // Талаар
-    double x2, y2, x3, y3; // Үлдсэн гурван орой
-public:
-    Square(double topLeftX, double topLeftY, double s) : Shape2D("Квадрат"), x(topLeftX), y(topLeftY), side(s) {
-        // Үлдсэн оройнуудыг тооцоолж байна
-        x2 = x + side;
-        y2 = y;
-        x3 = x;
-        y3 = y - side;
-    }
-
-    double area() override {
-        return side * side; // Квадратын талбай
-    }
-
-    double perimeter() override {
-        return 4 * side; // Квадратын периметр
-    }
-
-    void display() override {
-        cout << "Квадрат: Зүүн Дээд Орой(" << x << ", " << y << "), Тал: " << side << endl;
-        cout << "Бусад оройнууд: (" << x2 << ", " << y2 << "), (" << x3 << ", " << y3 << ")" << endl;
-        cout << "Талбай: " << area() << ", Периметр: " << perimeter() << endl;
-    }
-};
-
-// Зөв гурвалжны класс
-class Triangle : public Shape2D {
-private:
-    double x, y; // Дээд орой
-    double side; // Гурвалжны тал
-    double x2, y2, x3, y3; // Бусад оройнууд
-public:
-    Triangle(double topX, double topY, double s) : Shape2D("Зөв Гурвалжин"), x(topX), y(topY), side(s) {
-        // Зөв гурвалжин тул, оройнуудыг тооцоолж гаргая
-        x2 = x - side / 2;
-        y2 = y - (sqrt(3) / 2) * side;
-        x3 = x + side / 2;
-        y3 = y - (sqrt(3) / 2) * side;
-    }
-
-    double area() override {
-        return (sqrt(3) / 4) * side * side; // Тэгш өнцөгт гурвалжны талбай
-    }
-
-    double perimeter() override {
-        return 3 * side; // Гурвалжны периметр
-    }
-
-    void display() override {
-        cout << "Зөв Гурвалжин: Дээд Орой(" << x << ", " << y << "), Тал: " << side << endl;
-        cout << "Бусад оройнууд: (" << x2 << ", " << y2 << "), (" << x3 << ", " << y3 << ")" << endl;
-        cout << "Талбай: " << area() << ", Периметр: " << perimeter() << endl;
-    }
-};
-
-// Функц: талбайгаар эрэмблэх (Bubble Sort ашиглан)
-void sortShapes(Shape* shapes[], int size) {
-    for (int i = 0; i < size - 1; ++i) {
-        for (int j = 0; j < size - i - 1; ++j) {
-            if (shapes[j]->area() > shapes[j + 1]->area()) {
-                // Өөрсдийн байрлалаа солих
-                Shape* temp = shapes[j];
-                shapes[j] = shapes[j + 1];
-                shapes[j + 1] = temp;
+    private:
+        double x, y;
+        double side;
+        double x2, y2, x3, y3;
+    public:
+        Square(double topLeftX, double topLeftY, double s) : Shape2D("Квадрат"), x(topLeftX), y(topLeftY), side(s) {
+            this->x2 = this->x + this->side;
+            this->y2 = this->y;
+            this->x3 = this->x;
+            this->y3 = this->y - this->side;
+        }
+    
+        double area() const override {
+            return this->side * this->side;
+        }
+    
+        double perimeter() const override {
+            return 4 * this->side;
+        }
+    
+        void display() const override {
+            cout << "Квадрат: Зүүн Дээд Орой(" << this->x << ", " << this->y << "), Тал: " << this->side << endl;
+            cout << "Бусад оройнууд: (" << this->x2 << ", " << this->y2 << "), (" << this->x3 << ", " << this->y3 << ")" << endl;
+            cout << "Талбай: " << this->area() << ", Периметр: " << this->perimeter() << endl;
+        }
+    };
+    
+    // Зөв гурвалжин
+    class Triangle : public Shape2D {
+    private:
+        double x, y;
+        double side;
+        double x2, y2, x3, y3;
+    public:
+        Triangle(double topX, double topY, double s) : Shape2D("Зөв Гурвалжин"), x(topX), y(topY), side(s) {
+            this->x2 = this->x - this->side / 2;
+            this->y2 = this->y - (sqrt(3) / 2) * this->side;
+            this->x3 = this->x + this->side / 2;
+            this->y3 = this->y - (sqrt(3) / 2) * this->side;
+        }
+    
+        double area() const override {
+            return (sqrt(3) / 4) * this->side * this->side;
+        }
+    
+        double perimeter() const override {
+            return 3 * this->side;
+        }
+    
+        void display() const override {
+            cout << "Зөв Гурвалжин: Дээд Орой(" << this->x << ", " << this->y << "), Тал: " << this->side << endl;
+            cout << "Бусад оройнууд: (" << this->x2 << ", " << this->y2 << "), (" << this->x3 << ", " << this->y3 << ")" << endl;
+            cout << "Талбай: " << this->area() << ", Периметр: " << this->perimeter() << endl;
+        }
+    };
+    
+    // Эрэмбэлэх функц: талбай болон периметрээр
+    void sortShapes(Shape* shapes[], int size) {
+        for (int i = 0; i < size - 1; ++i) {
+            for (int j = 0; j < size - i - 1; ++j) {
+                double area1 = shapes[j]->area();
+                double area2 = shapes[j + 1]->area();
+    
+                if (area1 > area2 || (area1 == area2 && shapes[j]->perimeter() > shapes[j + 1]->perimeter())) {
+                    Shape* temp = shapes[j];
+                    shapes[j] = shapes[j + 1];
+                    shapes[j + 1] = temp;
+                }
             }
         }
     }
-}
-
-// Гол програм
-int main() {
-    Shape* shapes[3];  // Массив
-    double cx, cy, radius, sx, sy, side, tx, ty, tside;
-
-    // Тойргийн мэдээллийг гараас оруулах
-    cout << "Тойргийн төвийн координат (x, y) болон радиусыг оруулна уу: ";
-    cin >> cx >> cy >> radius;
-    shapes[0] = new Circle(cx, cy, radius);
-
-    // Квадратын мэдээллийг гараас оруулах
-    cout << "Квадратын зүүн дээд оройн координат (x, y) болон талын уртыг оруулна уу: ";
-    cin >> sx >> sy >> side;
-    shapes[1] = new Square(sx, sy, side);
-
-    // Зөв гурвалжны мэдээллийг гараас оруулах
-    cout << "Зөв гурвалжны дээд оройн координат (x, y) болон талын уртыг оруулна уу: ";
-    cin >> tx >> ty >> tside;
-    shapes[2] = new Triangle(tx, ty, tside);
-
-    // Эрэмбэлж үзэх (Bubble Sort)
-    sortShapes(shapes, 3);
-
-    // Эцэст нь дэлгэцэнд гаргах
-    cout << "\nТалбайгаар эрэмбэлсэн хэлбэрүүд:\n";
-    for (int i = 0; i < 3; ++i) {
-        shapes[i]->display();
-        cout << "----------------------" << endl;
+    
+    // Гол програм
+    int main() {
+        Shape* shapes[3];
+        double cx, cy, radius, sx, sy, side, tx, ty, tside;
+    
+        cout << "Тойргийн төвийн координат (x, y) болон радиусыг оруулна уу: ";
+        cin >> cx >> cy >> radius;
+        shapes[0] = new Circle(cx, cy, radius);
+    
+        cout << "Квадратын зүүн дээд оройн координат (x, y) болон талын уртыг оруулна уу: ";
+        cin >> sx >> sy >> side;
+        shapes[1] = new Square(sx, sy, side);
+    
+        cout << "Зөв гурвалжны дээд оройн координат (x, y) болон талын уртыг оруулна уу: ";
+        cin >> tx >> ty >> tside;
+        shapes[2] = new Triangle(tx, ty, tside);
+    
+        sortShapes(shapes, 3);
+    
+        cout << "\nТалбай болон периметрээр эрэмбэлсэн хэлбэрүүд:\n";
+        for (int i = 0; i < 3; ++i) {
+            shapes[i]->display();
+            cout << "----------------------" << endl;
+        }
+    
+        cout << "Нийт хэлбэрүүдийн тоо: " << Shape::getObjectCount() << endl;
+    
+        for (int i = 0; i < 3; ++i) {
+            delete shapes[i];
+        }
+    
+        return 0;
     }
-
-    // Цэвэрлэгээ
-    for (int i = 0; i < 3; ++i) {
-        delete shapes[i];
-    }
-
-    return 0;
-}
