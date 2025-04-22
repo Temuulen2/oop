@@ -2,7 +2,7 @@
 #include <vector>       // vector контейнер ашиглах
 using namespace std;
 
-// 👤 Person (Хүн) анги
+//  Person (Хүн) анги
 
 class Person {
 protected:
